@@ -20,5 +20,5 @@ USER root
 RUN mkdir -p /app/log /tmp/metabase && \
     chmod -R 777 /app/log /tmp/metabase
 
-# Set the default command
-CMD ["java", "-jar", "metabase.jar"]
+# Switch back to the metabase user
+USER metabase

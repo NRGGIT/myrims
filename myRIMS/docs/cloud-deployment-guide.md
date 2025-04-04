@@ -161,10 +161,12 @@ The PostgreSQL database is automatically initialized with the CERIF data model, 
    - Adding `ENV POSTGRES_INITDB_ARGS="--no-su-prefix"` to the db.dockerfile
    - Using non-root users in the Metabase and Airbyte Dockerfiles
    - If you still encounter this error, you may need to modify the PostgreSQL entrypoint script or use a different PostgreSQL image
-5. **Metabase logging errors**: If you encounter errors related to Metabase log files (e.g., "no such file or directory" for log files), we've addressed this by:
-   - Creating necessary log directories with appropriate permissions in the Metabase Dockerfile
+5. **Metabase startup errors**: If you encounter errors with Metabase not starting properly, it could be due to overriding the base image's startup command. We've addressed this by:
+   - Removing the custom CMD directive from the Metabase Dockerfile
+   - Letting the container use the default startup provided by the base image
+   - Creating necessary log directories with appropriate permissions
    - Setting explicit logging configuration via environment variables
-   - If you still encounter logging issues, you may need to mount a persistent volume for logs or adjust the permissions further
+   - If you still encounter startup issues, check the container logs for specific error messages
 6. **Database connection issues**: Ensure the PostgreSQL service is running and the credentials are correct. In cloud environments, make sure to set the correct database host address in the `.env` file.
 7. **Metabase not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Metabase configuration are correct. In cloud environments, set the `DB_HOST` environment variable to the correct address (e.g., `svc-postgres.app-4fe8f1a1.svc.cluster.local`).
 8. **Airbyte not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Airbyte configuration are correct. In cloud environments, set the `AIRBYTE_DB_HOST` environment variable to the correct address.
