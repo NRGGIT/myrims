@@ -45,6 +45,3 @@ temp/
 # Kubernetes
 kubeconfig
 
-# Temp Docs
-CERIF-Core/
-CERIF-DataModel/
