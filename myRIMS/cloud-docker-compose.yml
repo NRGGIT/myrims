@@ -37,8 +37,13 @@ services:
       MB_DB_PASS: rims_password
       MB_DB_HOST: ${DB_HOST:-postgres}
       JAVA_OPTS: "-Xmx2g"
+      # Add log configuration
+      MB_LOGGING_LEVEL: INFO
+      MB_JETTY_HOST: 0.0.0.0
+      MB_JETTY_PORT: 3000
     volumes:
       - metabase_data:/metabase-data
+      - metabase_logs:/app/log
     ports:
       - "${METABASE_PORT}:3000"
     depends_on:
@@ -95,6 +100,7 @@ services:
 volumes:
   postgres_data:
   metabase_data:
+  metabase_logs:
   airbyte_db_data:
   airbyte_workspace:
   airbyte_data:
