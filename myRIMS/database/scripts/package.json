@@ -1,0 +1,16 @@
+{
+  "name": "cerif-parser",
+  "version": "1.0.0",
+  "description": "Parser for CERIF data model",
+  "main": "parse-cerif.js",
+  "type": "module",
+  "scripts": {
+    "parse": "node parse-cerif.js",
+    "test-connection": "node test-connection.js"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.3.2",
+    "fs-extra": "^11.2.0",
+    "pg": "^8.11.3"
+  }
+}

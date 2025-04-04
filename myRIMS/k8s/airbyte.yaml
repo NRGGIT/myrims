@@ -1,0 +1,341 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airbyte-secrets
+type: Opaque
+data:
+  DATABASE_USER: YWlyYnl0ZQ==  # airbyte in base64
+  DATABASE_PASSWORD: YWlyYnl0ZQ==  # airbyte in base64
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airbyte-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airbyte-workspace-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airbyte-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airbyte-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airbyte-db
+  template:
+    metadata:
+      labels:
+        app: airbyte-db
+    spec:
+      containers:
+      - name: airbyte-db
+        image: postgres:13
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_PASSWORD
+        - name: POSTGRES_DB
+          value: "airbyte"
+        volumeMounts:
+        - name: airbyte-db-data
+          mountPath: /var/lib/postgresql/data
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "airbyte"]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: airbyte-db-data
+        persistentVolumeClaim:
+          claimName: airbyte-db-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airbyte-init
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airbyte-init
+  template:
+    metadata:
+      labels:
+        app: airbyte-init
+    spec:
+      containers:
+      - name: airbyte-init
+        image: airbyte/init:latest
+        env:
+        - name: DATABASE_HOST
+          value: "airbyte-db"
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: DATABASE_DB
+          value: "airbyte"
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_PASSWORD
+      restartPolicy: OnFailure
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airbyte-scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airbyte-scheduler
+  template:
+    metadata:
+      labels:
+        app: airbyte-scheduler
+    spec:
+      containers:
+      - name: airbyte-scheduler
+        image: airbyte/scheduler:latest
+        env:
+        - name: DATABASE_HOST
+          value: "airbyte-db"
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: DATABASE_DB
+          value: "airbyte"
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_PASSWORD
+        volumeMounts:
+        - name: airbyte-workspace
+          mountPath: /tmp/workspace
+        - name: airbyte-data
+          mountPath: /data
+      volumes:
+      - name: airbyte-workspace
+        persistentVolumeClaim:
+          claimName: airbyte-workspace-pvc
+      - name: airbyte-data
+        persistentVolumeClaim:
+          claimName: airbyte-data-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airbyte-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airbyte-worker
+  template:
+    metadata:
+      labels:
+        app: airbyte-worker
+    spec:
+      containers:
+      - name: airbyte-worker
+        image: airbyte/worker:latest
+        env:
+        - name: DATABASE_HOST
+          value: "airbyte-db"
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: DATABASE_DB
+          value: "airbyte"
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_PASSWORD
+        volumeMounts:
+        - name: airbyte-workspace
+          mountPath: /tmp/workspace
+        - name: airbyte-data
+          mountPath: /data
+      volumes:
+      - name: airbyte-workspace
+        persistentVolumeClaim:
+          claimName: airbyte-workspace-pvc
+      - name: airbyte-data
+        persistentVolumeClaim:
+          claimName: airbyte-data-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airbyte-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airbyte-server
+  template:
+    metadata:
+      labels:
+        app: airbyte-server
+    spec:
+      containers:
+      - name: airbyte-server
+        image: ${REGISTRY_URL}/myRIMS/airbyte:latest
+        ports:
+        - containerPort: 8001
+        env:
+        - name: DATABASE_HOST
+          value: "airbyte-db"
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: DATABASE_DB
+          value: "airbyte"
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airbyte-secrets
+              key: DATABASE_PASSWORD
+        volumeMounts:
+        - name: airbyte-workspace
+          mountPath: /tmp/workspace
+        - name: airbyte-data
+          mountPath: /data
+      volumes:
+      - name: airbyte-workspace
+        persistentVolumeClaim:
+          claimName: airbyte-workspace-pvc
+      - name: airbyte-data
+        persistentVolumeClaim:
+          claimName: airbyte-data-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airbyte-webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airbyte-webapp
+  template:
+    metadata:
+      labels:
+        app: airbyte-webapp
+    spec:
+      containers:
+      - name: airbyte-webapp
+        image: airbyte/webapp:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airbyte-db
+spec:
+  selector:
+    app: airbyte-db
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airbyte-server
+spec:
+  selector:
+    app: airbyte-server
+  ports:
+  - port: 8001
+    targetPort: 8001
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airbyte-webapp
+spec:
+  selector:
+    app: airbyte-webapp
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: airbyte-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: airbyte.${DOMAIN}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: airbyte-webapp
+            port:
+              number: 80

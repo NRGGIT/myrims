@@ -1,0 +1,904 @@
+@startuml
+!startsub common
+    !define datatype(x) class x << (D,#add0b2) DataType>> #ffffff
+    hide empty members
+    skinparam BoxPadding 120
+!endsub
+
+' === Agent hierarchy ===
+
+!startsub Agent
+    class "Agent" #ffffff {
+        keywords : List<Multilingual_String>
+    	lifetime : Date_Range
+    	contacts : List<Contact_Information>
+    }
+    "Agent" ..> "Date_Range"
+    "Agent" ..> "0..*" "Contact_Information"
+!endsub
+
+!startsub Person
+    class "Person" #ffffff {
+        name            : Person_Name
+        alternateNames  : List<Person_Name>
+    }
+!endsub
+
+!startsub Agent_Identifier
+    class "Agent_Identifier" #ffffff {
+    }
+
+    "Agent_Identifier" "0..*" <-- "1" "Agent" : has identifier <
+!endsub
+
+!startsub Agent_Identifier_Hierarchy
+    class "ORCID_Identifier" #ffffff {
+        orcidId : ORCID_iD
+    }
+
+    "Agent_Identifier" <|-- "ORCID_Identifier"
+
+    class "ROR_Identifier" #ffffff {
+            rorId : ROR_ID
+        }
+
+    "Agent_Identifier" <|-- "ROR_Identifier"
+
+    class "ISNI_Identifier" #ffffff {
+            isniId : ISNI_ID
+        }
+
+    "Agent_Identifier" <|-- "ISNI_Identifier"
+
+    class "FundRef_Identifier" #ffffff {
+            fundRefId : FundRef_ID
+        }
+
+    "Agent_Identifier" <|-- "FundRef_Identifier"
+
+    class "Wikidata_Agent_Identifier" #ffffff {
+           wikidataId : Wikidata_ID
+        }
+
+    "Agent_Identifier" <|-- "Wikidata_Agent_Identifier"
+
+    class "Local_Agent_Identifier" #ffffff {
+           localId : Local_Agent_ID
+    }
+
+    "Agent_Identifier" <|-- "Local_Agent_Identifier"
+!endsub
+
+!startsub Person
+    "Agent" <|-- "Person"
+!endsub
+
+!startsub Person
+    datatype("Person_Name") {
+        firstNames : Multilingual_String
+        familyNames : Multilingual_String
+        otherNames : Multilingual_String
+        displayName : Multilingual_String
+    }
+!endsub
+
+!startsub Person
+    "Person" ..> "Person_Name"
+!endsub
+
+!startsub Group_or_Organisation_Unit
+    class "Group_or_Organisation_Unit" #ffffff {
+        name : Multilingual_String
+        acronym : Multilingual_String
+        description : Multilingual_String
+    }
+!endsub
+
+!startsub Group_or_Organisation_Unit
+	"Agent" <|-- "Group_or_Organisation_Unit"
+!endsub
+
+!startsub Group
+    class "Group" #ffffff {
+    }
+!endsub
+
+!startsub Group
+	"Group_or_Organisation_Unit" <|-- "Group"
+!endsub
+
+!startsub Organisation_Unit
+    class "Organisation_Unit" #ffffff {
+    }
+!endsub
+
+!startsub Organisation_Unit
+	"Group_or_Organisation_Unit" <|-- "Organisation_Unit"
+!endsub
+
+!startsub Organisation_Unit
+	"Organisation_Unit" "0..* part of" <..> "0..* parts" "Organisation_Unit"
+!endsub
+
+!startsub Group
+	"Group" "0..* part of" <..> "0..* parts" "Group"
+!endsub
+
+!startsub Organisation_Unit_with_Members
+    class "Organisation_Unit_with_Members" #ffffff {
+    }
+!endsub
+
+!startsub Organisation_Unit_with_Members
+    "Group" <|-- "Organisation_Unit_with_Members"
+!endsub
+
+!startsub Organisation_Unit_with_Members
+    "Organisation_Unit" <|-- "Organisation_Unit_with_Members"
+!endsub
+
+' === Activity hierarchy ===
+
+!startsub Activity
+    class "Activity" #ffffff {
+  		dateRange : Date_Range
+    }
+!endsub
+
+!startsub Involvement
+    class "Involvement" #ffffff {
+        description : Multilingual_String
+        position    : Position
+    }
+!endsub
+
+!startsub Involvement
+   "Activity" <|-d- "Involvement"
+!endsub
+
+!startsub Employment
+    class "Employment" #ffffff {
+    }
+!endsub
+
+!startsub Employment
+    "Involvement" <|-d- "Employment"
+!endsub
+
+!startsub Education
+    class "Education" #ffffff {
+        completed   :   Boolean
+    }
+!endsub
+
+!startsub Education
+    "Involvement" <|-d- "Education"
+!endsub
+
+!startsub Membership
+    class "Membership" #ffffff {
+    }
+!endsub
+
+!startsub Membership
+    "Involvement" <|-d- "Membership"
+!endsub
+
+!startsub Contribution
+    class "Contribution" #ffffff {
+    }
+!endsub
+
+!startsub Contribution
+    "Activity" <|-d- "Contribution"
+!endsub
+
+!startsub Contribution_to_Project
+    class "Contribution_to_Project" #ffffff {
+    }
+!endsub
+
+!startsub Contribution_to_Project
+    "Contribution" <|-d- "Contribution_to_Project"
+!endsub
+
+!startsub Contribution_to_Document
+    class "Contribution_to_Document" #ffffff {
+    }
+!endsub
+
+!startsub Contribution_to_Document
+    "Contribution" <|-d- "Contribution_to_Document"
+!endsub
+
+!startsub Contribution_to_Event
+    class "Contribution_to_Event" #ffffff {
+    }
+!endsub
+
+!startsub Contribution_to_Event
+    "Contribution" <|-d- "Contribution_to_Event"
+!endsub
+
+!startsub Contribution_to_Infrastructure
+    class "Contribution_to_Infrastructure" #ffffff {
+    }
+!endsub
+
+!startsub Contribution_to_Infrastructure
+    "Contribution" <|-d- "Contribution_to_Infrastructure"
+!endsub
+
+!startsub Contribution_to_Prize
+    class "Contribution_to_Prize" #ffffff {
+    }
+!endsub
+
+!startsub Contribution_to_Prize
+    "Contribution" <|-d- "Contribution_to_Prize"
+!endsub
+
+!startsub Contribution_to_Prize_Award
+    class "Contribution_to_Prize_Award" #ffffff {
+    }
+!endsub
+
+!startsub Contribution_to_Prize_Award
+    "Contribution" <|-d- "Contribution_to_Prize_Award"
+!endsub
+
+
+!startsub Activity
+	"Document" "0..*" -- "0..*" "Activity" : prove >
+!endsub
+
+' === Agent - Activity links ===
+
+!startsub Activity
+    "Activity" "0..*" --> "0..1" "Agent" : actor >
+!endsub
+
+!startsub Involvement
+	"Involvement" "0..*" --> "Group_or_Organisation_Unit" : involved in >
+!endsub
+
+' === Resource hierarchy ===
+
+!startsub Resource
+    class "Resource" #ffffff {
+    }
+!endsub
+
+!startsub Funding
+    class "Funding" #ffffff {
+        amount  :   Monetary_Amount
+    }
+!endsub
+
+!startsub Funding
+    datatype("Monetary_Amount") {
+        amount : Decimal
+        currencyCode  : ISO_4217_Alpha_Code
+    }
+!endsub
+
+!startsub Funding
+    "Funding" ..> "Monetary_Amount"
+!endsub
+
+!startsub Funding
+     "Resource" <|-- "Funding"
+!endsub
+
+!startsub Infrastructure
+    class "Infrastructure" #ffffff {
+        title : Multilingual_String
+        acronym : Multilingual_String
+        url : Website_Address
+    }
+
+    "Resource" <|-- "Infrastructure"
+
+!endsub
+
+!startsub Contribution_to_Infrastructure
+    "Contribution_to_Infrastructure" --> "Infrastructure" : infrastructure >
+!endsub
+
+!startsub Document_isa_Resource
+	"Resource" <|-- "Document"
+!endsub
+
+!startsub Document
+    class "Document" #ffffff {
+        title : Multilingual_String
+        publicationDate : Date
+    }
+
+    "Document" "0..*" -- "0..*" "Document" : is part of >
+
+    "Document" "0..*" -- "0..*" "Document" : another representation of >
+
+!endsub
+
+!startsub Publication_Channel
+    class "Publication_Channel" #ffffff {
+        title : Multilingual_String
+        acronym : Multilingual_String
+    }
+
+    "Document" --> "0..1" "Document_Publication_Channel" : published via channel >
+
+    class "Document_Publication_Channel" #ffffff {
+        startPage : String
+        endPage : String
+        articleNumber : String
+        volume : String
+        number : String
+        startFrame : Time
+        endFrame : Time
+    }
+
+    "Document_Publication_Channel" --> "0..1" "Publication_Channel" : published in >
+
+    class "Repository" #ffffff {
+    }
+
+    "Publication_Channel" <|-- "Repository"
+
+    "Infrastructure" <|-- "Repository"
+
+!endsub
+
+!startsub Funding
+     "Funding" "0..*" -- "0..*" "Funding" : is part of >
+!endsub
+
+!startsub Resource_Identifier
+    class "Resource_Identifier" #ffffff {
+    }
+
+    "Resource_Identifier" "0..*" <-- "1" "Resource" : has identifier <
+
+    class "DOI_Identifier" #ffffff {
+        doiId : DOI_ID
+    }
+
+    "Resource_Identifier" <|-- "DOI_Identifier"
+
+    class "Wikidata_Resource_Identifier" #ffffff {
+        wikidataId : Wikidata_ID
+    }
+
+    "Resource_Identifier" <|-- "Wikidata_Resource_Identifier"
+
+    class "Local_Resource_Identifier" #ffffff {
+        localId : Local_Resource_ID
+    }
+
+    "Resource_Identifier" <|-- "Local_Resource_Identifier"
+
+!endsub
+
+!startsub Contribution_to_Project
+    "Contribution_to_Project" --> "Project" : project >
+!endsub
+
+!startsub Project
+    class "Project" #ffffff {
+        name : Multilingual_String
+        acronym : Multilingual_String
+    }
+!endsub
+
+!startsub Project
+  	"Project" "1 part of" <..> "0..* parts" "Project"
+!endsub
+
+!startsub Event
+    class "Event" #ffffff {
+        title : Multilingual_String
+        acronym : Multilingual_String
+        description : Multilingual_String
+        dateRange : Date_Range
+        ordinalNumber: Decimal
+        contacts : List<Contact_Information>
+    }
+
+    "Event" ..> "Date_Range"
+    "Event" ..> "0..*" "Contact_Information"
+
+    class "Event_Series" #ffffff {
+        title : Multilingual_String
+        acronym : Multilingual_String
+        description : Multilingual_String
+        recurrencePeriod : Decimal
+        recurrenceUnit : Multilingual_String
+        contacts : List<Contact_Information>
+    }
+
+    Event --> "0..1" "Event_Series"
+
+    Event --> "0..*" "Event" : collocated with >
+
+!endsub
+
+!startsub Event_Identifier
+    class "Event_Identifier" #ffffff {
+    }
+
+    "Event_Identifier" "0..*" <-- "0..1" "Event" : has identifier <
+
+    "Event_Identifier" "0..*" <-- "0..1" "Event_Series" : has identifier <
+
+!endsub
+
+!startsub Contribution_Statement
+    class "Contribution_Statement" #ffffff {
+        statement : Multilingual_String
+    }
+!endsub
+
+!startsub Resource_Usage_Statement
+    class "Resource_Usage_Statement" #ffffff {
+        statement : Multilingual_String
+    }
+!endsub
+
+!startsub Physical_Address
+    datatype("Physical_Address") {
+        country : Country
+    }
+
+    datatype("Simple_Physical_Address") {
+        address : Multilingual_String
+    }
+
+    datatype("Structured_Physical_Address") {
+        street : Multilingual_String
+        city : Multilingual_String
+        zipCode : Multilingual_String
+        stateOrProvince : Multilingual_String
+    }
+
+     "Physical_Address" <|-d- "Simple_Physical_Address"
+     "Physical_Address" <|-d- "Structured_Physical_Address"
+
+     datatype("Contact_Information") {
+     }
+
+     datatype("Postal_Address") {
+          physicalAddress : Physical_Address
+     }
+
+     "Contact_Information" <|-d- "Postal_Address"
+     "Postal_Address" ..> "Physical_Address"
+
+
+     datatype("Visiting_Address") {
+          physicalAddress : Physical_Address
+     }
+
+     "Contact_Information" <|-d- "Visiting_Address"
+     "Visiting_Address" ..> "Physical_Address"
+
+     datatype("Electronic_Address") {
+          uri : URI
+     }
+
+     "Contact_Information" <|-d- "Electronic_Address"
+
+     datatype("Email_Address") {
+     }
+
+     "Electronic_Address" <|-d- "Email_Address"
+
+     datatype("Website_Address") {
+     }
+
+     "Electronic_Address" <|-d- "Website_Address"
+
+     datatype("Phone_Number") {
+     }
+
+     "Electronic_Address" <|-d- "Phone_Number"
+
+
+!endsub
+
+!startsub Country
+    datatype("Country") {
+         iso3166alpha2Code : ISO_3166_Alpha2_Code
+         name : Multilingual_String
+    }
+!endsub
+
+!startsub Physical_Address
+    "Physical_Address" o..> "Country" : country >
+!endsub
+
+!startsub Affiliation_Statement
+    class "Affiliation_Statement" #ffffff {
+        displayAffiliation : Multilingual_String
+        displayPersonName : Multilingual_String
+        contacts : List<Contact_Information>
+        position : Position
+    }
+!endsub
+
+!startsub Application
+    class "Application" #ffffff {
+        date : Date
+    }
+!endsub
+
+!startsub Decision
+    class "Decision" #ffffff {
+        date : Date
+    }
+!endsub
+
+!startsub Funding_Application
+    class "Funding_Application" #ffffff {
+    }
+!endsub
+
+!startsub Funding_Application
+    "Application" <|-- "Funding_Application"
+!endsub
+
+!startsub Call_for_Applications
+    class "Call_for_Applications" #ffffff {
+    }
+!endsub
+
+!startsub Call_for_Funding_Applications
+    class "Call_for_Funding_Applications" #ffffff {
+    }
+!endsub
+
+!startsub Evaluation_Outcome
+	class "Evaluation_Outcome" #ffffff {
+	}
+!endsub
+
+!startsub Contribution_to_Evaluation_Outcome
+	class "Contribution_to_Evaluation_Outcome" #ffffff {
+	}
+!endsub
+
+!startsub Application_Review
+	class "Application_Review" #ffffff {
+	}
+!endsub
+
+!startsub Prize
+	class "Prize" #ffffff {
+	}
+!endsub
+
+!startsub Prize_Award
+	class "Prize_Award" #ffffff {
+	}
+!endsub
+
+!startsub Resource_Request
+    "Resource_Request" -u-> "0..1" "Agent" : requester >
+!endsub
+
+!startsub Resource_Request
+    "Resource_Request" -u-> "0..1" "Agent" : addressee >
+!endsub
+
+!startsub Resource_Offer
+	"Resource_Offer" -u-> "solicited by" "Agent"
+!endsub
+
+!startsub Evaluation_Outcome
+    "Resource_Request" "0..1" -- "0..*" "Evaluation_Outcome" : of <
+!endsub
+
+!startsub Call_for_Applications
+    "Application" "0..*" -l- "0..1" "Call_for_Applications" : in response to >
+!endsub
+
+!startsub Resource_Request
+    "Resource_Request" o-- "0..1" "Document" : described by >
+!endsub
+
+!startsub Decision
+    "Resource_Request" -r- "0..1" "Decision" : on <
+!endsub
+
+!startsub Decision
+    "Decision" o-- "0..1" "Document" : expressed in >
+!endsub
+
+!startsub Call_for_Funding_Applications
+    "Call_for_Applications" <|-- "Call_for_Funding_Applications"
+!endsub
+
+!startsub Decision
+    "Decision" -u-> "0..*" "Agent" : made <
+!endsub
+
+!startsub Evaluation_Outcome
+    "Evaluation_Outcome" -d-> "0..1" "Decision" : provides basis for >
+!endsub
+
+!startsub Contribution_to_Evaluation_Outcome
+    "Contribution" <|-- "Contribution_to_Evaluation_Outcome"
+!endsub
+
+!startsub Application_Review
+    "Contribution_to_Evaluation_Outcome" <|-- "Application_Review"
+!endsub
+
+!startsub Contribution_to_Evaluation_Outcome
+    "Contribution_to_Evaluation_Outcome" --> "Evaluation_Outcome"
+!endsub
+
+!startsub Affiliation_Statement
+    "Activity" "0..*" o-- "0..*" "Affiliation_Statement" : affiliation statements >
+    "Affiliation_Statement" "0..*" --> "1" "Organisation_Unit" : institution >
+    "Affiliation_Statement" "0..*" --> "0..1" "Organisation_Unit" : organisation unit >
+    "Affiliation_Statement" "0..*" --> "0..1" "Person" : person >
+!endsub
+
+!startsub Contribution_Statement
+    "Contribution" *-- "0..*" "Contribution_Statement" : is detailed in >
+!endsub
+
+!startsub Contribution_to_Document
+    "Contribution_to_Document" "0..* contributions <<ordered>>" <--> "1" "Document"
+!endsub
+
+!startsub Contribution_to_Event
+    "Contribution_to_Event" --> "Event" : event >
+!endsub
+
+!startsub Contribution_to_Prize
+    "Contribution_to_Prize" --> "Prize" : has target >
+!endsub
+
+!startsub Contribution_to_Prize_Award
+    "Contribution_to_Prize_Award" --> "Prize_Award" : has target >
+!endsub
+
+!startsub Contribution
+     "Contribution_Statement" --> "0..1" "Resource" : provides >
+!endsub
+
+!startsub Resource_Usage_Statement
+     "Resource_Usage_Statement" --> "Resource" : uses >
+!endsub
+
+!startsub Resource_Usage_Statement
+     "Contribution_Statement" o-l- "0..*" "Resource_Usage_Statement"
+!endsub
+
+!startsub Prize_Award
+	"Prize_Award" "0..*" -l-o "Prize" : awards >
+!endsub
+
+!startsub Prize_Award
+	"Prize_Award" "0..*" <--> "0..*" "Agent" : recipient >
+!endsub
+
+!startsub Prize_Award
+	"Prize" --> "Agent" : by whom >
+!endsub
+
+!startsub Prize_Award
+	"Prize_Award" --> "0..1" "Document" : for >
+!endsub
+
+!startsub Prize_Award
+	"Prize_Award" --> "0..1" "Project" : for >
+!endsub
+
+!startsub Prize_Award
+	"Prize_Award" --> "0..1" "Event" : for >
+!endsub
+
+!startsub Resource_Offer
+	class "Resource_Offer" #ffffff {
+	}
+!endsub
+
+!startsub Resource_Offer
+	"Resource_Offer" "0..*" --> "1..*" "Resource" : of >
+!endsub
+
+!startsub Call_for_Applications
+	"Resource_Offer" <|-- "Call_for_Applications"
+!endsub
+
+!startsub Condition
+	class "Condition" #ffffff {
+	}
+!endsub
+
+!startsub Resource_Offer
+	"Resource_Offer" o-- "0..*" "Condition" : has >
+!endsub
+
+!startsub Resource_Request
+	class "Resource_Request" #ffffff {
+	}
+!endsub
+
+!startsub Application
+	"Resource_Request" <|-- "Application"
+!endsub
+
+!startsub Resource_Offer
+	"Resource_Offer" "0..1" o-- "0..*" "Document" : described by >
+!endsub
+
+!startsub Resource_Request
+	"Resource_Request" "0..*" --> "0..1" "Resource_Request" : revises >
+!endsub
+
+!startsub Resource_Request
+	"Resource_Request" "0..*" --> "1..*" "Resource" : of >
+!endsub
+
+!startsub Expertise_and_Skills
+	class "Expertise_and_Skills" #ffffff {
+	}
+!endsub
+
+!startsub Expertise_and_Skills_Possession
+	class "Expertise_and_Skills_Possession" #ffffff {
+	}
+!endsub
+
+!startsub Expertise_and_Skills_Condition
+	class "Expertise_and_Skills_Condition" #ffffff {
+	}
+!endsub
+
+!startsub Expertise_and_Skills_Possession
+	"Expertise_and_Skills" <-- "0..*" "Expertise_and_Skills_Possession"
+!endsub
+
+!startsub Expertise_and_Skills_Possession
+	"Agent" <-- "0..*" "Expertise_and_Skills_Possession"
+!endsub
+
+!startsub Expertise_and_Skills_Possession
+	"Document" "is evidenced by 0..*" <--> "provides evidence of 0..*" "Expertise_and_Skills_Possession"
+!endsub
+
+!startsub Expertise_and_Skills_Condition
+	"Expertise_and_Skills" <-- "0..*" "Expertise_and_Skills_Condition"
+!endsub
+
+!startsub Expertise_and_Skills_Condition
+	"Condition" <|-- "Expertise_and_Skills_Condition"
+!endsub
+
+!startsub Expertise_and_Time_and_Effort
+	class "Expertise_and_Time_and_Effort" #ffffff {
+	  amountOfTimeInPersonHours : Decimal
+	}
+!endsub
+
+!startsub Expertise_and_Time_and_Effort
+	"Resource" <|-- "Expertise_and_Time_and_Effort"
+!endsub
+
+!startsub Expertise_and_Time_and_Effort
+	"Agent" "by agent 1" <--> "0..*" "Expertise_and_Time_and_Effort"
+!endsub
+
+!startsub Expertise_and_Time_and_Effort
+	"Expertise_and_Skills" "uses expertise and skills 0..*" <--> "0..*" "Expertise_and_Time_and_Effort"
+!endsub
+
+!startsub Position
+    datatype("Position") {
+        title   :   Multilingual_String
+        code    :   String
+	}
+!endsub
+
+!startsub Position
+	"Affiliation_Statement" ..> "Position"
+!endsub
+
+!startsub Position
+	"Employment" "0..1" --> "0..*" "Document" : contract >
+!endsub
+
+!startsub Position
+	"Involvement" ..> "Position"
+!endsub
+
+!startsub Involvement
+	"Involvement" "0..*" -l-> "0..*" "Affiliation_Statement" : is the foundation for >
+!endsub
+
+!startsub Involvement
+	"Involvement" "0..*" --> "0..1" "Involvement" : part >
+!endsub
+
+!startsub Involvement
+	"Involvement" "0..*" --> "0..*" "Involvement" : part transitive >
+!endsub
+
+!startsub Date_Range
+    datatype("Date_Range") {
+        startDate : Date
+        startDateInclusive : Boolean
+        endDate : Date
+        endDateInclusive : Boolean
+	}
+!endsub
+
+!startsub Activity
+	"Activity" ..> "Date_Range"
+!endsub
+
+!startsub Funding
+    "Activity" "0..* covers" <---> "0..* funded by" "Funding"
+    "Project" "0..* covers" <---> "0..* funded by" "Funding"
+!endsub
+
+!startsub Language
+    datatype("Language") {
+        name : Multilingual_String
+        iso6391Code : ISO_639_1_Alpha2_Code
+        iso6392TCode : ISO_639_2T_Alpha3_Code
+        iso6392BCode : ISO_639_2B_Alpha3_Code
+	}
+!endsub
+
+!startsub Script
+    datatype("Script") {
+        name : Multilingual_String
+        scriptCode : ISO_15924_Alphabetic_Code
+	}
+!endsub
+
+!startsub Acknowledgement_Statement
+    class "Acknowledgement_Statement" #ffffff {
+        statement : Multilingual_String
+    }
+!endsub
+
+!startsub Acknowledgement_Statement
+    "Contribution" *-- "0..*" "Acknowledgement_Statement" : testified by >
+!endsub
+
+!startsub Form
+    class "Text" #ffffff {
+        numberOfPages : Decimal
+        numberOfWords : Decimal
+        numberOfCharacters : Decimal
+    }
+
+    class "Video" #ffffff {
+        duration : Time_Amount
+    }
+
+    class "Audio" #ffffff {
+        duration : Time_Amount
+    }
+
+    class "Tangible" #ffffff {
+    }
+
+    class "Downloadable" #ffffff {
+        downloadURL : Website_Address
+        mimeType    : String
+        size        : Decimal
+    }
+
+    datatype("Time_Amount") {
+    }
+
+!endsub
+
+@enduml
