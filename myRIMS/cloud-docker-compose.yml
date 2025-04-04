@@ -1,4 +1,5 @@
-version: '3.8'
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.version: '3.8'
 
 services:
   # PostgreSQL database with CERIF data model
