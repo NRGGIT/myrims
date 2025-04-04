@@ -114,26 +114,38 @@ There are two options for cloud deployment:
 
 This option is suitable for cloud platforms that support Docker Compose deployments with environment variables, volumes, and port mapping.
 
-1. Build and push Docker images, then prepare deployment files:
-   ```bash
-   chmod +x deploy-cloud.sh
-   ./deploy-cloud.sh [registry-url]
+1. Clone the repository and create an `.env` file:
+   ```
+   # Registry URL for Docker images
+   REGISTRY_URL=your-registry-url
+   
+   # Ports for services (these will be assigned by your cloud platform)
+   POSTGRES_PORT=5432
+   METABASE_PORT=3000
+   AIRBYTE_DB_PORT=5433
+   AIRBYTE_SERVER_PORT=8001
+   AIRBYTE_WEBAPP_PORT=80
    ```
 
 2. Upload the following files to your cloud platform:
    - `cloud-docker-compose.yml`
    - `.env` (adjust port values as needed for your cloud platform)
+   - Dockerfiles for each component (database, metabase, airbyte)
 
-3. Deploy the application using your cloud platform's interface:
+3. Build the Docker images using your cloud platform's interface:
+   - The database Dockerfile includes a multi-stage build that generates the SQL files for the CERIF data model
+   - The Metabase and Airbyte Dockerfiles extend the official images with custom configurations
+
+4. Deploy the application using your cloud platform's interface:
    - Use the `cloud-docker-compose.yml` file for configuration
    - Ensure all required ports are exposed as HTTPS if needed
 
-4. After deployment, configure:
+5. After deployment, configure:
    - Set up Metabase dashboards for different user roles
    - Configure Airbyte connectors for your data sources
    - Set up scheduled data synchronization jobs
 
-5. Access your application at the URLs provided by your cloud platform
+6. Access your application at the URLs provided by your cloud platform
 
 For detailed instructions, see the [Cloud Deployment Guide](docs/cloud-deployment-guide.md).
 

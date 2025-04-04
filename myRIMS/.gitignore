@@ -5,7 +5,8 @@ yarn-debug.log
 yarn-error.log
 
 # Database
-database/init/*.sql
+# Uncomment the line below if you want to ignore SQL files in the database/init directory
+# database/init/*.sql
 
 # Docker
 .docker/
@@ -16,6 +17,8 @@ database/init/*.sql
 .env.development.local
 .env.test.local
 .env.production.local
+# Do not ignore the template
+!.env.template
 
 # Logs
 logs

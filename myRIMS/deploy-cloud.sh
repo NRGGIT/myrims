@@ -12,6 +12,18 @@ cd database/scripts
 ./generate-sql.sh
 cd ../..
 
+# Ensure the SQL files are not ignored by git
+echo "Ensuring SQL files are not ignored by git..."
+if grep -q "^database/init/\*.sql" .gitignore; then
+  echo "Updating .gitignore to not ignore SQL files..."
+  sed -i 's/^database\/init\/\*.sql/# database\/init\/\*.sql/' .gitignore
+fi
+
+# Add the SQL files to git if they're not already tracked
+echo "Adding SQL files to git..."
+git add database/init/*.sql
+git commit -m "Add SQL files for database initialization" || true
+
 # Build and push the database image
 echo "Building and pushing the database image..."
 docker build -t ${REGISTRY_URL}/myRIMS/database:latest ./database

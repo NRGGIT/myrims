@@ -11,7 +11,7 @@ This guide provides detailed instructions for deploying myRIMS to a cloud enviro
 
 ## Deployment Steps
 
-### 1. Prepare the Docker Images
+### 1. Prepare for Deployment
 
 1. Clone the repository:
    ```bash
@@ -19,18 +19,24 @@ This guide provides detailed instructions for deploying myRIMS to a cloud enviro
    cd myRIMS
    ```
 
-2. Run the deployment script to build and push the Docker images:
-   ```bash
-   chmod +x deploy-cloud.sh
-   ./deploy-cloud.sh [registry-url]
+2. Create an `.env` file with the following content:
+   ```
+   # Registry URL for Docker images
+   REGISTRY_URL=your-registry-url
+   
+   # Ports for services (these will be assigned by your cloud platform)
+   POSTGRES_PORT=5432
+   METABASE_PORT=3000
+   AIRBYTE_DB_PORT=5433
+   AIRBYTE_SERVER_PORT=8001
+   AIRBYTE_WEBAPP_PORT=80
    ```
 
-   Replace `[registry-url]` with your container registry URL (e.g., `docker.io/yourusername` for Docker Hub).
+   Replace `your-registry-url` with your container registry URL (e.g., `docker.io/yourusername` for Docker Hub).
 
-   This script will:
-   - Generate SQL files for the CERIF data model
-   - Build and push the database, Metabase, and Airbyte images to your container registry
-   - Generate an `.env` file with default environment variables
+3. Build the Docker images:
+   - The database Dockerfile includes a multi-stage build that generates the SQL files for the CERIF data model
+   - The Metabase and Airbyte Dockerfiles extend the official images with custom configurations
 
 ### 2. Configure Environment Variables
 
