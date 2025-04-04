@@ -9,14 +9,15 @@ COPY database/scripts/package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the script files
-COPY database/scripts/parse-cerif.js ./
+# Create directory structure
+RUN mkdir -p database/scripts database/init
 
-# Create output directory
-RUN mkdir -p init
+# Copy the script files
+COPY database/scripts/parse-cerif.js database/scripts/
 
 # Run the script to generate SQL files
-RUN node parse-cerif.js
+WORKDIR /app
+RUN node database/scripts/parse-cerif.js
 
 FROM postgres:15
 
@@ -26,7 +27,7 @@ ENV POSTGRES_PASSWORD=rims_password
 ENV POSTGRES_DB=rims_db
 
 # Copy initialization scripts from builder stage
-COPY --from=builder /app/init/*.sql /docker-entrypoint-initdb.d/
+COPY --from=builder /app/database/init/*.sql /docker-entrypoint-initdb.d/
 
 # Set the working directory
 WORKDIR /docker-entrypoint-initdb.d

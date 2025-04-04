@@ -1,4 +1,4 @@
-in# myRIMS - Research Information Management System
+# myRIMS - Research Information Management System
 
 A Research Information Management System (RIMS) based on the CERIF (Common European Research Information Format) data model. This system provides a comprehensive solution for managing research information, including researchers, projects, publications, funding, and more.
 

@@ -1,9 +1,11 @@
-git@github.com: Permission denied (publickey).
-fatal: Could not read from remote repository.version: '3.8'
+version: '3.8'
 
 services:
   # PostgreSQL database with CERIF data model
   postgres:
+    build:
+      context: .
+      dockerfile: db.dockerfile
     image: ${REGISTRY_URL}/myRIMS/database:latest
     restart: always
     environment:
@@ -22,6 +24,9 @@ services:
 
   # Metabase for user interface
   metabase:
+    build:
+      context: .
+      dockerfile: metabase.dockerfile
     image: ${REGISTRY_URL}/myRIMS/metabase:latest
     restart: always
     environment:
@@ -59,6 +64,9 @@ services:
       retries: 5
 
   airbyte-server:
+    build:
+      context: .
+      dockerfile: airbyte.dockerfile
     image: ${REGISTRY_URL}/myRIMS/airbyte:latest
     restart: always
     environment:

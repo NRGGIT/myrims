@@ -19,7 +19,7 @@ This guide provides detailed instructions for deploying myRIMS to a cloud enviro
    cd myRIMS
    ```
 
-2. Create an `.env` file with the following content:
+2. Create an `.env` file with the following content (or copy from `.env.template`):
    ```
    # Registry URL for Docker images
    REGISTRY_URL=your-registry-url
@@ -34,9 +34,10 @@ This guide provides detailed instructions for deploying myRIMS to a cloud enviro
 
    Replace `your-registry-url` with your container registry URL (e.g., `docker.io/yourusername` for Docker Hub).
 
-3. Build the Docker images:
-   - The database Dockerfile includes a multi-stage build that generates the SQL files for the CERIF data model
-   - The Metabase and Airbyte Dockerfiles extend the official images with custom configurations
+3. Understand the Dockerfiles:
+   - `db.dockerfile`: A multi-stage build that generates SQL files for the CERIF data model and creates a PostgreSQL database
+   - `metabase.dockerfile`: Extends the official Metabase image with custom configurations
+   - `airbyte.dockerfile`: Extends the official Airbyte server image with custom configurations
 
 ### 2. Configure Environment Variables
 
@@ -62,11 +63,16 @@ This guide provides detailed instructions for deploying myRIMS to a cloud enviro
 1. Upload the following files to your cloud platform:
    - `cloud-docker-compose.yml`
    - `.env`
+   - `db.dockerfile`
+   - `metabase.dockerfile`
+   - `airbyte.dockerfile`
+   - The entire `database` directory (containing scripts and init subdirectories)
 
 2. Use your cloud platform's interface to deploy the application:
    - Specify the `cloud-docker-compose.yml` file as the configuration file
    - Ensure the `.env` file is in the same directory or properly referenced
    - Configure any platform-specific settings (e.g., networking, storage)
+   - The cloud-docker-compose.yml file is configured to build the images using the Dockerfiles
 
 3. Ensure all required ports are exposed as HTTPS if needed:
    - Metabase UI: Port 3000
@@ -139,9 +145,13 @@ The PostgreSQL database is automatically initialized with the CERIF data model, 
    - Insufficient resources (memory, CPU)
    - Port conflicts
    - Volume mount issues
-3. **Database connection issues**: Ensure the PostgreSQL service is running and the credentials are correct.
-4. **Metabase not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Metabase configuration are correct.
-5. **Airbyte not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Airbyte configuration are correct.
+3. **Database build errors**: If you encounter errors during the database build process, check that:
+   - The directory structure is correct (the `database` directory contains both `scripts` and `init` subdirectories)
+   - The `db.dockerfile` is correctly configured to copy and run the scripts
+   - The paths in the COPY commands match the actual directory structure
+4. **Database connection issues**: Ensure the PostgreSQL service is running and the credentials are correct.
+5. **Metabase not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Metabase configuration are correct.
+6. **Airbyte not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Airbyte configuration are correct.
 
 ### Logs
 
