@@ -13,5 +13,8 @@ EXPOSE 8001
 # Set volumes
 VOLUME ["/tmp/workspace", "/data"]
 
+# Use a non-root user if possible
+USER airbyte
+
 # Set the default command
 CMD ["java", "-jar", "airbyte.jar"]

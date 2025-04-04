@@ -46,6 +46,10 @@ This guide provides detailed instructions for deploying myRIMS to a cloud enviro
    # Registry URL for Docker images
    REGISTRY_URL=your-registry-url
    
+   # Database hosts (use the full address for your cloud environment)
+   DB_HOST=svc-postgres.app-4fe8f1a1.svc.cluster.local
+   AIRBYTE_DB_HOST=svc-airbyte-db.app-4fe8f1a1.svc.cluster.local
+   
    # Ports for services (these will be assigned by your cloud platform)
    POSTGRES_PORT=5432
    METABASE_PORT=3000
@@ -54,7 +58,11 @@ This guide provides detailed instructions for deploying myRIMS to a cloud enviro
    AIRBYTE_WEBAPP_PORT=80
    ```
 
-   Adjust the port values as needed for your cloud platform. Some cloud platforms may assign these ports dynamically.
+   Adjust the following values as needed for your cloud platform:
+   - `REGISTRY_URL`: Your container registry URL
+   - `DB_HOST`: The address of your PostgreSQL service in the cloud environment
+   - `AIRBYTE_DB_HOST`: The address of your Airbyte database service in the cloud environment
+   - Port values: Some cloud platforms may assign these ports dynamically
 
 2. If your cloud platform requires additional environment variables (e.g., for authentication, networking), add them to the `.env` file.
 
@@ -149,9 +157,13 @@ The PostgreSQL database is automatically initialized with the CERIF data model, 
    - The directory structure is correct (the `database` directory contains both `scripts` and `init` subdirectories)
    - The `db.dockerfile` is correctly configured to copy and run the scripts
    - The paths in the COPY commands match the actual directory structure
-4. **Database connection issues**: Ensure the PostgreSQL service is running and the credentials are correct.
-5. **Metabase not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Metabase configuration are correct.
-6. **Airbyte not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Airbyte configuration are correct.
+4. **"su: unrecognized option: j" error**: This error occurs in the PostgreSQL container when it tries to execute initialization scripts. We've addressed this by:
+   - Adding `ENV POSTGRES_INITDB_ARGS="--no-su-prefix"` to the db.dockerfile
+   - Using non-root users in the Metabase and Airbyte Dockerfiles
+   - If you still encounter this error, you may need to modify the PostgreSQL entrypoint script or use a different PostgreSQL image
+5. **Database connection issues**: Ensure the PostgreSQL service is running and the credentials are correct. In cloud environments, make sure to set the correct database host address in the `.env` file.
+6. **Metabase not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Metabase configuration are correct. In cloud environments, set the `DB_HOST` environment variable to the correct address (e.g., `svc-postgres.app-4fe8f1a1.svc.cluster.local`).
+7. **Airbyte not connecting to the database**: Ensure the PostgreSQL service is running and the credentials in the Airbyte configuration are correct. In cloud environments, set the `AIRBYTE_DB_HOST` environment variable to the correct address.
 
 ### Logs
 

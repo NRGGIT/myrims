@@ -12,5 +12,8 @@ ENV JAVA_OPTS="-Xmx2g"
 # Expose the Metabase port
 EXPOSE 3000
 
+# Use a non-root user if possible
+USER metabase
+
 # Set the default command
 CMD ["java", "-jar", "metabase.jar"]

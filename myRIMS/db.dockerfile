@@ -25,6 +25,8 @@ FROM postgres:15
 ENV POSTGRES_USER=rims_admin
 ENV POSTGRES_PASSWORD=rims_password
 ENV POSTGRES_DB=rims_db
+# Disable su -j option which might be causing the error
+ENV POSTGRES_INITDB_ARGS="--no-su-prefix"
 
 # Copy initialization scripts from builder stage
 COPY --from=builder /app/database/init/*.sql /docker-entrypoint-initdb.d/
